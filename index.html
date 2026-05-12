@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Родителски дневник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#FDF9F4;--surface:#FFFFFF;--surface2:#F5EFE7;
+    --border:#E8DDD2;--border2:#D4C4B0;
+    --text:#2C1F14;--text2:#7A6655;--text3:#B8A898;
+    --accent:#C47A3A;--accent-light:#FDF0E3;--accent-dark:#8B5520;
+    --green:#3A7A5A;--green-light:#EAF5EE;
+    --blue:#3A5A7A;--blue-light:#E8EFF7;
+    --rose:#8B3A5A;--rose-light:#F7E8EE;
+    --purple:#5A3A8B;--purple-light:#F0EAFF;
+    --radius:12px;--radius-sm:8px;
+    --shadow:0 2px 12px rgba(44,31,20,0.08);
+    --shadow-lg:0 8px 32px rgba(44,31,20,0.14);
+  }
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px;flex-shrink:0}
+  header h1{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text)}
+  header p{font-size:11px;color:var(--text2)}
+  .emotions-link{padding:7px 13px;border-radius:var(--radius-sm);background:var(--purple-light);color:var(--purple);border:1px solid #D8C8F5;font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap}
+  .emotions-link:hover{background:#E8DCFF}
+
+  .container{max-width:740px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+  .tabs{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:6px;margin-bottom:1.5rem;flex-wrap:wrap}
+  .tab-btn{flex:1;min-width:100px;padding:9px 10px;border-radius:var(--radius-sm);border:none;background:transparent;color:var(--text2);font-size:13px;font-family:'Nunito',sans-serif;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all .18s}
+  .tab-btn:hover{background:var(--surface2);color:var(--text)}
+  .tab-btn.active{background:var(--accent);color:white;box-shadow:0 2px 8px rgba(196,122,58,.35)}
+
+  .section{display:none}.section.visible{display:block}
+  .section-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+
+  /* DAY GRID */
+  .day-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:1.25rem}
+  @media(max-width:500px){.day-grid{grid-template-columns:repeat(4,1fr)}}
+  .day-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 6px;cursor:pointer;background:var(--surface);text-align:center;transition:all .15s}
+  .day-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .day-card.active{border-color:var(--accent);background:var(--accent-light);box-shadow:0 2px 8px rgba(196,122,58,.2)}
+  .day-card .day-emoji{font-size:20px;margin-bottom:3px}
+  .day-card .day-name{font-size:11px;font-weight:700;color:var(--text2)}
+
+  /* DIARY */
+  .diary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
+  .diary-header{display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .diary-header h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text)}
+  .mood-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+  .mood-btn{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);font-size:13px;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .15s;color:var(--text2);font-weight:600}
+  .mood-btn:hover{border-color:var(--accent)}
+  .mood-btn.selected{background:var(--accent-light);border-color:var(--accent);color:var(--accent-dark)}
+  .divider{border:none;border-top:1px solid var(--border);margin:1rem 0}
+  .prompt-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:1.25rem}
+  .prompt-item label{font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px}
+  .prompt-item textarea{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:'Nunito',sans-serif;background:var(--surface2);color:var(--text);resize:vertical;min-height:60px;transition:border-color .15s;line-height:1.5}
+  .prompt-item textarea:focus{outline:none;border-color:var(--accent);background:#fff}
+  .prompt-item textarea::placeholder{color:var(--text3)}
+
+  .btn{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .btn:hover{background:var(--surface2)}
+  .btn-primary{background:var(--accent);color:white;border-color:var(--accent)}
+  .btn-primary:hover{background:var(--accent-dark);border-color:var(--accent-dark)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+
+  .feedback-box{margin-top:1.25rem;border-radius:var(--radius);border:1px solid var(--border2);overflow:hidden;display:none}
+  .feedback-box.visible{display:block}
+  .feedback-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--accent-light);border-bottom:1px solid var(--border)}
+  .feedback-header span{font-size:13px;font-weight:700;color:var(--accent-dark)}
+  .feedback-body{padding:1rem 1.25rem;font-size:14px;color:var(--text);line-height:1.8;background:#FFFBF6}
+  .typing-dots{display:inline-flex;gap:4px;align-items:center}
+  .typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:bounce 1.1s infinite ease-in-out}
+  .typing-dots span:nth-child(2){animation-delay:.18s}
+  .typing-dots span:nth-child(3){animation-delay:.36s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.6}40%{transform:translateY(-7px);opacity:1}}
+
+  /* RECIPES */
+  .need-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.25rem}
+  .need-chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-family:'Nunito',sans-serif;font-weight:600;cursor:pointer;transition:all .15s;color:var(--text2);display:flex;align-items:center;gap:5px}
+  .need-chip:hover{border-color:var(--accent)}
+  .need-chip.active{background:var(--accent);color:white;border-color:var(--accent)}
+
+  .recipe-type-tabs{display:flex;gap:8px;margin-bottom:1.25rem}
+  .rtype-btn{flex:1;padding:9px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:13px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+  .rtype-btn:hover{background:var(--surface2)}
+  .rtype-btn.active{background:var(--green);color:white;border-color:var(--green)}
+
+  .recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .recipe-card{border:1px solid var(--border);border-radius:var(--radius);padding:1rem;background:var(--surface);cursor:pointer;transition:all .18s;box-shadow:var(--shadow)}
+  .recipe-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--accent)}
+  .r-tag{font-size:10px;font-weight:700;padding:3px 9px;border-radius:10px;display:inline-block;margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+  .tag-quick{background:var(--green-light);color:var(--green)}
+  .tag-healthy{background:var(--blue-light);color:var(--blue)}
+  .tag-budget{background:#FDF0E3;color:#8B5520}
+  .tag-kids{background:var(--rose-light);color:var(--rose)}
+  .recipe-card h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.3}
+  .recipe-card .r-meta{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:8px}
+
+  /* MODAL */
+  .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(44,31,20,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:1rem}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:var(--radius);padding:1.5rem;max-width:460px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-lg);border:1px solid var(--border)}
+  .modal h2{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:6px;color:var(--text)}
+  .ing-table{width:100%;border-collapse:collapse;margin-bottom:1.25rem}
+  .ing-table tr{border-bottom:1px solid var(--border)}
+  .ing-table tr:last-child{border-bottom:none}
+  .ing-table td{padding:7px 0;font-size:14px;color:var(--text)}
+  .ing-table td:last-child{text-align:right;color:var(--text2);font-weight:600}
+  .steps-list{padding-left:1.3rem}
+  .steps-list li{font-size:14px;color:var(--text);line-height:1.65;margin-bottom:8px}
+
+  /* BEDTIME STORIES */
+  .story-setup{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);margin-bottom:1.25rem}
+  .story-setup h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;margin-bottom:.5rem;color:var(--text)}
+  .story-setup p{font-size:13px;color:var(--text2);margin-bottom:1.25rem}
+  .story-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.25rem}
+  @media(max-width:500px){.story-fields{grid-template-columns:1fr}}
+  .field-group label{font-size:13px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px}
+  .field-group input,.field-group select{width:100%;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:14px;font-family:'Nunito',sans-serif;background:var(--surface2);color:var(--text);transition:border-color .15s}
+  .field-group input:focus,.field-group select:focus{outline:none;border-color:var(--accent);background:#fff}
+
+  .story-output{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);display:none}
+  .story-output.visible{display:block}
+  .story-output-header{display:flex;align-items:center;gap:8px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .story-output-header h3{font-family:'Playfair Display',serif;font-size:17px;color:var(--text)}
+  .story-text{font-size:15px;color:var(--text);line-height:1.9;white-space:pre-wrap}
+  .story-text.loading{color:var(--text3);font-style:italic}
+
+  /* SUMMARY */
+  .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:10px;box-shadow:var(--shadow)}
+  .summary-card h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .summary-card p{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:3px}
+  .summary-card p strong{color:var(--text);font-weight:700}
+  .empty-note{font-size:14px;color:var(--text3);font-style:italic;text-align:center;padding:2rem}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-notebook"></i></div>
+    <div>
+      <h1>Родителски дневник</h1>
+      <p>Седмичен инструмент за родители</p>
+    </div>
+  </div>
+  <a href="emotions.html" class="emotions-link"><i class="ti ti-heart-rate-monitor"></i> Емоционален метър</a>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('diary',this)"><i class="ti ti-notebook"></i> Дневник</button>
+    <button class="tab-btn" onclick="switchTab('recipes',this)"><i class="ti ti-soup"></i> Рецепти</button>
+    <button class="tab-btn" onclick="switchTab('stories',this)"><i class="ti ti-moon-stars"></i> Приказки</button>
+    <button class="tab-btn" onclick="switchTab('summary',this)"><i class="ti ti-chart-bar"></i> Преглед</button>
+  </div>
+
+  <!-- DIARY -->
+  <div id="sec-diary" class="section visible">
+    <p class="section-label">Избери ден</p>
+    <div class="day-grid" id="dayGrid"></div>
+    <div id="diaryArea"></div>
+  </div>
+
+  <!-- RECIPES -->
+  <div id="sec-recipes" class="section">
+    <div class="recipe-type-tabs">
+      <button class="rtype-btn active" id="rtype-dinner" onclick="switchRecipeType('dinner',this)"><i class="ti ti-soup"></i> Вечери</button>
+      <button class="rtype-btn" id="rtype-snacks" onclick="switchRecipeType('snacks',this)"><i class="ti ti-apple"></i> Закуски за училище</button>
+    </div>
+
+    <!-- dinner sub -->
+    <div id="dinner-section">
+      <p class="section-label">Филтрирай по нужда</p>
+      <div class="need-filters">
+        <div class="need-chip active" data-need="all" onclick="filterRecipes('all',this)"><i class="ti ti-grid-dots"></i> Всички</div>
+        <div class="need-chip" data-need="quick" onclick="filterRecipes('quick',this)"><i class="ti ti-bolt"></i> Бързо</div>
+        <div class="need-chip" data-need="healthy" onclick="filterRecipes('healthy',this)"><i class="ti ti-leaf"></i> Здравословно</div>
+        <div class="need-chip" data-need="budget" onclick="filterRecipes('budget',this)"><i class="ti ti-coin"></i> Икономично</div>
+        <div class="need-chip" data-need="kids" onclick="filterRecipes('kids',this)"><i class="ti ti-mood-happy"></i> Деца</div>
+      </div>
+      <div class="recipe-grid" id="recipeGrid"></div>
+    </div>
+
+    <!-- snacks sub -->
+    <div id="snacks-section" style="display:none">
+      <p class="section-label">Идеи за закуски — с продукти и количества</p>
+      <div class="recipe-grid" id="snackGrid"></div>
+    </div>
+  </div>
+
+  <!-- BEDTIME STORIES -->
+  <div id="sec-stories" class="section">
+    <div class="story-setup">
+      <h2>🌙 Приказка за лека нощ</h2>
+      <p>Въведи името на детето и избери тема — ще се роди уникална приказка, в която то е главният герой.</p>
+      <div class="story-fields">
+        <div class="field-group">
+          <label>Име на детето</label>
+          <input type="text" id="childName" placeholder="напр. Мила" maxlength="30">
+        </div>
+        <div class="field-group">
+          <label>Тема на приказката</label>
+          <select id="storyTheme">
+            <option value="гора с магически животни">🌲 Магическа гора</option>
+            <option value="космически приключения">🚀 Космически приключения</option>
+            <option value="подводен свят с русалки">🐠 Подводен свят</option>
+            <option value="замък с дракони и принцеси">🐉 Замък с дракони</option>
+            <option value="вълшебна пекарна">🧁 Вълшебна пекарна</option>
+            <option value="детектив в магически град">🔍 Детектив приключение</option>
+            <option value="ферма с говорещи животни">🐄 Говореща ферма</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Възраст на детето</label>
+          <select id="childAge">
+            <option value="3-4 години">3–4 години</option>
+            <option value="5-6 години" selected>5–6 години</option>
+            <option value="7-8 години">7–8 години</option>
+            <option value="9-10 години">9–10 години</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Настроение на приказката</label>
+          <select id="storyMood">
+            <option value="весела и смешна">😄 Весела и смешна</option>
+            <option value="приключенска">⚡ Приключенска</option>
+            <option value="нежна и спокойна" selected>🌸 Нежна и спокойна</option>
+            <option value="вдъхновяваща">✨ Вдъхновяваща</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="storyBtn" onclick="generateStory()">
+        <i class="ti ti-wand"></i> Създай приказката
+      </button>
+    </div>
+
+    <div class="story-output" id="storyOutput">
+      <div class="story-output-header">
+        <span style="font-size:22px">🌙</span>
+        <h3 id="storyTitle">Приказката се зарежда...</h3>
+      </div>
+      <div class="story-text" id="storyText"></div>
+      <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="generateStory()"><i class="ti ti-refresh"></i> Нова приказка</button>
+        <button class="btn" onclick="printStory()"><i class="ti ti-printer"></i> Принтирай</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="sec-summary" class="section">
+    <p class="section-label" style="margin-bottom:12px">Твоите записи тази седмица</p>
+    <div id="summaryArea"></div>
+  </div>
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="modal-overlay" id="recipeModal" onclick="closeModal(event)">
+  <div class="modal" id="recipeModalContent"></div>
+</div>
+
+<script>
+const days=[
+  {id:'mon',name:'Пон',emoji:'😤'},{id:'tue',name:'Вт',emoji:'😊'},
+  {id:'wed',name:'Ср',emoji:'😴'},{id:'thu',name:'Чет',emoji:'💪'},
+  {id:'fri',name:'Пет',emoji:'😌'},{id:'sat',name:'Съб',emoji:'🌟'},
+  {id:'sun',name:'Нед',emoji:'🧘'}
+];
+const dayNames={mon:'Понеделник',tue:'Вторник',wed:'Сряда',thu:'Четвъртък',fri:'Петък',sat:'Събота',sun:'Неделя'};
+const prompts=[
+  {key:'emotion',label:'Коя беше най-силната емоция, която изпитах днес?'},
+  {key:'moment',label:'Един момент с детето, за който съм благодарен/а:'},
+  {key:'challenge',label:'Нещо, което беше предизвикателство:'},
+  {key:'tomorrow',label:'Утре ще... (постави си реална цел)'}
+];
+const moods=['😊 Добро','😐 Средно','😔 Трудно','😤 Стресирано','🥰 Пълно'];
+
+const recipes=[
+  {id:1,name:'Пилешки хапки с ориз',tag:'quick',tagLabel:'Бързо',time:'25 мин',servings:'4',needs:['quick','kids'],
+   ingredients:[['Пилешки гърди','500 г'],['Бял ориз','300 г'],['Лимонов сок','2 с.л.'],['Зехтин','3 с.л.'],['Чесън','2 скилидки'],['Сол, черен пипер','на вкус']],
+   steps:['Нарежи пилето на хапки, овкуси с лимон, сол и черен пипер.','Запържи в зехтин с чесън 8–10 минути до готовност.','Свари ориза по указанията на опаковката.','Сервирай ориза с хапките отгоре.']},
+  {id:2,name:'Зеленчукова супа крем',tag:'healthy',tagLabel:'Здравословно',time:'35 мин',servings:'4',needs:['healthy'],
+   ingredients:[['Тиква','400 г'],['Морков','2 бр.'],['Лук','1 бр.'],['Зеленчуков бульон','800 мл'],['Зехтин','2 с.л.'],['Кориандър','1 ч.л.'],['Сметана','50 мл']],
+   steps:['Нарежи зеленчуците на кубчета.','Запържи лука в зехтин 3 мин.','Добави тиква и морков, запържи 5 мин.','Налей бульона и вари 20 мин.','Пасирай до гладко, добави подправки и сметана.']},
+  {id:3,name:'Макарони с кайма',tag:'budget',tagLabel:'Икономично',time:'30 мин',servings:'5',needs:['budget','kids'],
+   ingredients:[['Макарони','400 г'],['Смляна кайма','300 г'],['Доматено пюре','200 г'],['Лук','1 бр.'],['Чесън','2 скилидки'],['Зехтин','2 с.л.'],['Настъргано сирене','50 г']],
+   steps:['Свари макароните, отцеди.','Запържи лука и чесъна в зехтин до омекване.','Добави каймата, запържи до побеляване.','Добави доматеното пюре, вари 10 мин.','Смесете с макароните, поръсете с настъргано сирене.']},
+  {id:4,name:'Яйца по панагюрски',tag:'quick',tagLabel:'Бързо',time:'15 мин',servings:'2',needs:['quick','budget'],
+   ingredients:[['Яйца','4 бр.'],['Кисело мляко','200 г'],['Масло','30 г'],['Чушки','2 бр.'],['Сол','на вкус'],['Червен пипер','½ ч.л.']],
+   steps:['Запечи чушките в масло 5 мин.','Разбий кисело млякото с малко сол.','Сготви яйцата до желана готовност.','Наредете в чиния, полей с лютото масло.']},
+  {id:5,name:'Сьомга с броколи',tag:'healthy',tagLabel:'Здравословно',time:'30 мин',servings:'4',needs:['healthy'],
+   ingredients:[['Сьомга (филета)','4 × 120 г'],['Броколи','400 г'],['Лимон','1 бр.'],['Зехтин','3 с.л.'],['Чесън','2 скилидки'],['Сол, черен пипер','на вкус']],
+   steps:['Загрей фурната на 200°С.','Постави рибата в тава, полей с зехтин и лимонов сок.','Добави броколито, поръси с чесън, сол и пипер.','Печи 20–22 мин.']},
+  {id:6,name:'Палачинки с банан',tag:'kids',tagLabel:'Деца',time:'20 мин',servings:'4',needs:['kids','quick'],
+   ingredients:[['Брашно','150 г'],['Яйца','2 бр.'],['Мляко','250 мл'],['Банан','1 бр.'],['Олио','2 с.л.'],['Мед или ягоди','за сервиране']],
+   steps:['Размачкай банана с вилица.','Разбий яйцата с млякото, добави брашното и банана.','Разбъркай до гладко тесто.','Пържи малки палачинки в загрят тиган.','Сервирай с мед или ягоди.']}
+];
+
+const snacks=[
+  {name:'Сандвич с авокадо',emoji:'🥑',ingredients:[['Пълнозърнест хляб','2 филии'],['Авокадо','½ бр.'],['Домат','½ бр.'],['Лимонов сок','1 ч.л.'],['Сол','на вкус']]},
+  {name:'Йогурт с плодове',emoji:'🫐',ingredients:[['Натурално кисело мляко','150 г'],['Горски плодове','80 г'],['Мед','1 ч.л.'],['Овесени ядки','2 с.л.']]},
+  {name:'Морков с хумус',emoji:'🥕',ingredients:[['Морков','2 бр.'],['Хумус','50 г'],['Краставица','½ бр.'],['Лимонов сок','½ ч.л.']]},
+  {name:'Ябълка с ядково масло',emoji:'🍎',ingredients:[['Ябълка','1 бр.'],['Фъстъчено масло','2 с.л.'],['Канела','щипка']]},
+  {name:'Енергийни топчета',emoji:'⚡',ingredients:[['Овесени ядки','100 г'],['Мед','3 с.л.'],['Фъстъчено масло','2 с.л.'],['Стафиди','30 г'],['Кокосово брашно','2 с.л.']]},
+  {name:'Сирене с плод и ядки',emoji:'🧀',ingredients:[['Сирене / кашкавал','40 г'],['Грозде или ягоди','80 г'],['Орехи или бадеми','15 г'],['Пълнозърнести крекери','4 бр.']]}
+];
+
+let currentDay='mon', diaryData={}, activeFilter='all', currentRecipeType='dinner';
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('visible'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+tab).classList.add('visible');
+  btn.classList.add('active');
+  if(tab==='summary') renderSummary();
+}
+
+function switchRecipeType(type,btn){
+  currentRecipeType=type;
+  document.querySelectorAll('.rtype-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dinner-section').style.display=type==='dinner'?'block':'none';
+  document.getElementById('snacks-section').style.display=type==='snacks'?'block':'none';
+}
+
+function renderDayGrid(){
+  document.getElementById('dayGrid').innerHTML=days.map(d=>`
+    <div class="day-card ${d.id===currentDay?'active':''}" onclick="selectDay('${d.id}')">
+      <div class="day-emoji">${d.emoji}</div>
+      <div class="day-name">${d.name}</div>
+    </div>`).join('');
+}
+
+function selectDay(id){saveDayData();currentDay=id;renderDayGrid();renderDiaryArea();}
+
+function saveDayData(){
+  const data={};
+  prompts.forEach(p=>{const el=document.getElementById('prompt-'+p.key);if(el)data[p.key]=el.value;});
+  const mEl=document.querySelector('.mood-btn.selected');
+  data.mood=mEl?mEl.dataset.mood:'';
+  if(diaryData[currentDay]) data.feedback=diaryData[currentDay].feedback||'';
+  diaryData[currentDay]=data;
+}
+
+function renderDiaryArea(){
+  const saved=diaryData[currentDay]||{};
+  const d=days.find(x=>x.id===currentDay);
+  document.getElementById('diaryArea').innerHTML=`
+    <div class="diary-card">
+      <div class="diary-header">
+        <span style="font-size:24px">${d.emoji}</span>
+        <h2>${dayNames[currentDay]}</h2>
+      </div>
+      <p class="section-label">Как се чувствам?</p>
+      <div class="mood-row">
+        ${moods.map(m=>`<button class="mood-btn ${saved.mood===m?'selected':''}" data-mood="${m}" onclick="selectMood(this)">${m}</button>`).join('')}
+      </div>
+      <hr class="divider">
+      <div class="prompt-list">
+        ${prompts.map(p=>`
+          <div class="prompt-item">
+            <label>${p.label}</label>
+            <textarea id="prompt-${p.key}" placeholder="Напиши тук...">${saved[p.key]||''}</textarea>
+          </div>`).join('')}
+      </div>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveAndGetFeedback()">
+        <i class="ti ti-sparkles"></i> Запази и получи подкрепа
+      </button>
+      <div class="feedback-box ${saved.feedback?'visible':''}" id="feedbackBox">
+        <div class="feedback-header">
+          <i class="ti ti-heart" style="color:var(--accent);font-size:16px"></i>
+          <span>Лично послание за теб</span>
+        </div>
+        <div class="feedback-body" id="feedbackBody">${saved.feedback||''}</div>
+      </div>
+    </div>`;
+}
+
+function selectMood(btn){
+  document.querySelectorAll('.mood-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+async function saveAndGetFeedback(){
+  saveDayData();
+  const data=diaryData[currentDay];
+  const saveBtn=document.getElementById('saveBtn');
+  const feedbackBox=document.getElementById('feedbackBox');
+  const feedbackBody=document.getElementById('feedbackBody');
+  saveBtn.disabled=true;
+  saveBtn.innerHTML='<i class="ti ti-loader"></i> Зареждане...';
+  feedbackBox.classList.add('visible');
+  feedbackBody.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  const hasContent=data.emotion||data.moment||data.challenge||data.tomorrow||data.mood;
+  if(!hasContent){
+    feedbackBody.innerHTML='Попълни поне едно поле, за да получиш обратна връзка. 💛';
+    saveBtn.disabled=false;
+    saveBtn.innerHTML='<i class="ti ti-sparkles"></i> Запази и получи подкрепа';
+    return;
+  }
+  const prompt=`Родител попълни своя дневник за ${dayNames[currentDay]}.
+${data.mood?'Настроение: '+data.mood:''}
+${data.emotion?'Най-силна емоция: '+data.emotion:''}
+${data.moment?'Момент с детето: '+data.moment:''}
+${data.challenge?'Предизвикателство: '+data.challenge:''}
+${data.tomorrow?'Цел за утре: '+data.tomorrow:''}
+
+Напиши кратко, топло и лично послание на български — признай усилията им, дай им мотивация и подкрепа. Бъди топъл и искрен, като близък приятел. Не повече от 4–5 изречения.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:'Ти си топъл, съпричастен асистент за родители. Говориш само на български. Отговаряш кратко, лично и мотивиращо — като близък приятел, не като терапевт.',
+        messages:[{role:'user',content:prompt}]})
+    });
+    const json=await res.json();
+    const text=(json.content||[]).map(c=>c.text||'').join('');
+    feedbackBody.innerHTML=text||'Ти правиш невероятна работа всеки ден. 💛';
+    diaryData[currentDay].feedback=feedbackBody.innerHTML;
+  }catch(e){
+    feedbackBody.innerHTML='Не успях да се свържа в момента, но знай — ти правиш страхотна работа! 💛';
+  }
+  saveBtn.disabled=false;
+  saveBtn.innerHTML='<i class="ti ti-sparkles"></i> Запази и получи подкрепа';
+}
+
+function filterRecipes(need,chip){
+  activeFilter=need;
+  document.querySelectorAll('.need-chip').forEach(c=>c.classList.remove('active'));
+  chip.classList.add('active');
+  renderRecipes();
+}
+
+const tagClass={quick:'tag-quick',healthy:'tag-healthy',budget:'tag-budget',kids:'tag-kids'};
+
+function renderRecipes(){
+  const list=activeFilter==='all'?recipes:recipes.filter(r=>r.needs.includes(activeFilter));
+  document.getElementById('recipeGrid').innerHTML=list.map(r=>`
+    <div class="recipe-card" onclick="openRecipe(${r.id})">
+      <span class="r-tag ${tagClass[r.tag]}">${r.tagLabel}</span>
+      <h3>${r.name}</h3>
+      <div class="r-meta"><span><i class="ti ti-clock"></i> ${r.time}</span><span><i class="ti ti-users"></i> ${r.servings}</span></div>
+    </div>`).join('');
+}
+
+function renderSnacks(){
+  document.getElementById('snackGrid').innerHTML=snacks.map(s=>`
+    <div class="recipe-card" style="cursor:default">
+      <span style="font-size:22px;display:block;margin-bottom:8px">${s.emoji}</span>
+      <h3 style="margin-bottom:8px">${s.name}</h3>
+      <table class="ing-table" style="margin:0">
+        ${s.ingredients.map(([n,q])=>`<tr><td style="font-size:13px;padding:4px 0">${n}</td><td style="font-size:13px;padding:4px 0;text-align:right;color:var(--text2)">${q}</td></tr>`).join('')}
+      </table>
+    </div>`).join('');
+}
+
+function openRecipe(id){
+  const r=recipes.find(x=>x.id===id);
+  document.getElementById('recipeModalContent').innerHTML=`
+    <span class="r-tag ${tagClass[r.tag]}" style="margin-bottom:10px;display:inline-block">${r.tagLabel}</span>
+    <h2 style="margin-bottom:4px">${r.name}</h2>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1.25rem;display:flex;gap:12px">
+      <span><i class="ti ti-clock"></i> ${r.time}</span><span><i class="ti ti-users"></i> ${r.servings} порции</span>
+    </p>
+    <p class="section-label" style="margin-bottom:6px">Продукти</p>
+    <table class="ing-table">${r.ingredients.map(([n,q])=>`<tr><td>${n}</td><td>${q}</td></tr>`).join('')}</table>
+    <p class="section-label" style="margin-bottom:8px">Начин на приготвяне</p>
+    <ol class="steps-list">${r.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+    <button class="btn" style="margin-top:1.25rem" onclick="document.getElementById('recipeModal').classList.remove('open')"><i class="ti ti-x"></i> Затвори</button>`;
+  document.getElementById('recipeModal').classList.add('open');
+}
+
+function closeModal(e){if(e.target===document.getElementById('recipeModal'))document.getElementById('recipeModal').classList.remove('open');}
+
+async function generateStory(){
+  const name=document.getElementById('childName').value.trim();
+  if(!name){document.getElementById('childName').focus();document.getElementById('childName').style.borderColor='var(--accent)';return;}
+  const theme=document.getElementById('storyTheme').value;
+  const age=document.getElementById('childAge').value;
+  const mood=document.getElementById('storyMood').value;
+  const btn=document.getElementById('storyBtn');
+  const output=document.getElementById('storyOutput');
+  const titleEl=document.getElementById('storyTitle');
+  const textEl=document.getElementById('storyText');
+  btn.disabled=true;
+  btn.innerHTML='<i class="ti ti-loader"></i> Пиша приказката...';
+  output.classList.add('visible');
+  titleEl.textContent='Приказката за '+name+' се ражда...';
+  textEl.className='story-text loading';
+  textEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  const prompt=`Напиши кратка приказка за лека нощ на български за дете на ${age}.
+Главен герой е ${name}. Темата е: ${theme}. Настроението е: ${mood}.
+Приказката трябва да е подходяща за четене преди сън — около 200-250 думи.
+${name} трябва да е активен герой, да реши някакъв малък проблем или да открие нещо хубаво.
+Завърши с нещо топло и успокояващо. Не добавяй заглавие — аз ще го покажа отделно.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:'Ти си творчески разказвач за деца. Пишеш само на български. Езикът е топъл, образен и подходящ за детска възраст. Нямаш страшни или тревожни елементи.',
+        messages:[{role:'user',content:prompt}]})
+    });
+    const json=await res.json();
+    const text=(json.content||[]).map(c=>c.text||'').join('');
+    titleEl.textContent='Приказка за '+name;
+    textEl.className='story-text';
+    textEl.textContent=text||'Имало едно време едно малко дете на име '+name+'...';
+  }catch(e){
+    textEl.className='story-text';
+    textEl.textContent='Не успях да се свържа в момента. Опитай отново след малко.';
+  }
+  btn.disabled=false;
+  btn.innerHTML='<i class="ti ti-wand"></i> Създай приказката';
+}
+
+function printStory(){
+  const title=document.getElementById('storyTitle').textContent;
+  const text=document.getElementById('storyText').textContent;
+  const w=window.open('','_blank');
+  w.document.write(`<html><head><title>${title}</title><style>body{font-family:Georgia,serif;max-width:600px;margin:40px auto;font-size:16px;line-height:1.8;color:#2C1F14}h1{font-size:22px;margin-bottom:24px}</style></head><body><h1>🌙 ${title}</h1><p>${text.replace(/\n/g,'</p><p>')}</p></body></html>`);
+  w.document.close();w.print();
+}
+
+function renderSummary(){
+  let html='';
+  days.forEach(d=>{
+    const data=diaryData[d.id];
+    if(data&&(data.mood||Object.values(data).some(v=>v&&typeof v==='string'&&v.trim()))){
+      html+=`<div class="summary-card">
+        <h3>${d.emoji} ${dayNames[d.id]} ${data.mood?'— '+data.mood:''}</h3>
+        ${data.emotion?`<p><strong>Емоция:</strong> ${data.emotion}</p>`:''}
+        ${data.moment?`<p><strong>Момент:</strong> ${data.moment}</p>`:''}
+        ${data.challenge?`<p><strong>Предизвикателство:</strong> ${data.challenge}</p>`:''}
+        ${data.tomorrow?`<p><strong>Цел:</strong> ${data.tomorrow}</p>`:''}
+      </div>`;
+    }
+  });
+  document.getElementById('summaryArea').innerHTML=html||'<p class="empty-note">Все още няма записи тази седмица.<br>Започни с раздела Дневник.</p>';
+}
+
+renderDayGrid();
+renderDiaryArea();
+renderRecipes();
+renderSnacks();
+</script>
+</body>
+</html>

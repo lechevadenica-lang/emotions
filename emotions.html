@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Емоционален метър — Родителски дневник</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#F8F4FF;--surface:#FFFFFF;--surface2:#F0EAFF;
+    --border:#DDD0F5;--border2:#C8B8F0;
+    --text:#1E1433;--text2:#6B5A8B;--text3:#A898C8;
+    --accent:#7C4DFF;--accent-light:#EDE7FF;--accent-dark:#5B2FE0;
+    --green:#3A7A5A;--green-light:#EAF5EE;
+    --orange:#C47A3A;--orange-light:#FDF0E3;
+    --red:#C0392B;--red-light:#FDECEA;
+    --blue:#3A5A7A;--blue-light:#E8EFF7;
+    --radius:14px;--radius-sm:8px;
+    --shadow:0 2px 12px rgba(30,20,51,0.08);
+    --shadow-lg:0 8px 32px rgba(30,20,51,0.14);
+  }
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:var(--shadow)}
+  .logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:38px;height:38px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:18px}
+  header h1{font-family:'Playfair Display',serif;font-size:18px;font-weight:600;color:var(--text)}
+  header p{font-size:11px;color:var(--text2)}
+  .back-link{padding:7px 13px;border-radius:var(--radius-sm);background:var(--surface2);color:var(--accent);border:1px solid var(--border);font-size:12px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;display:flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap}
+  .back-link:hover{background:var(--accent-light)}
+
+  .container{max-width:680px;margin:0 auto;padding:2rem 1rem 4rem}
+
+  .intro-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--shadow);text-align:center}
+  .intro-card h2{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:.5rem}
+  .intro-card p{font-size:14px;color:var(--text2);max-width:480px;margin:0 auto}
+
+  /* MOOD METER */
+  .meter-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;box-shadow:var(--shadow)}
+  .meter-card h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:1.25rem}
+
+  .mood-meter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
+  .mood-option{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:14px 10px;border-radius:var(--radius);border:2px solid transparent;background:var(--surface2);transition:all .2s;min-width:90px;flex:1}
+  .mood-option:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
+  .mood-option.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:0 4px 16px rgba(124,77,255,.2)}
+  .mood-option .mood-emoji{font-size:32px;line-height:1}
+  .mood-option .mood-label{font-size:12px;font-weight:700;color:var(--text2);text-align:center}
+  .mood-option.selected .mood-label{color:var(--accent-dark)}
+
+  .meter-bar-wrap{margin:1.25rem 0;position:relative}
+  .meter-bar-bg{height:14px;border-radius:10px;background:linear-gradient(to right,#C0392B,#E67E22,#F1C40F,#2ECC71,#7C4DFF);position:relative;overflow:visible}
+  .meter-needle{position:absolute;top:50%;width:3px;height:28px;background:var(--text);border-radius:2px;transform:translate(-50%,-50%);transition:left .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .meter-needle::after{content:'▲';position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text)}
+  .meter-labels{display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--text3);font-weight:600}
+
+  /* QUESTIONS */
+  .questions-section{margin-top:1.5rem}
+  .q-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:12px;box-shadow:var(--shadow)}
+  .q-card h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+  .q-card h4 span{font-size:18px}
+
+  .scale-row{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .scale-btn{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);background:var(--surface2);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif}
+  .scale-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .scale-btn.selected{background:var(--accent);border-color:var(--accent);color:white;transform:scale(1.15);box-shadow:0 3px 10px rgba(124,77,255,.35)}
+  .scale-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:5px;font-weight:600}
+
+  .yesno-row{display:flex;gap:10px}
+  .yn-btn{flex:1;padding:10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:var(--surface2);font-size:14px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Nunito',sans-serif}
+  .yn-btn:hover{border-color:var(--accent)}
+  .yn-btn.selected-yes{background:var(--green-light);border-color:var(--green);color:var(--green)}
+  .yn-btn.selected-no{background:var(--red-light);border-color:var(--red);color:var(--red)}
+
+  .btn{padding:9px 18px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .15s}
+  .btn:hover{background:var(--surface2)}
+  .btn-accent{background:var(--accent);color:white;border-color:var(--accent)}
+  .btn-accent:hover{background:var(--accent-dark)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+
+  /* RESULT */
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-top:1.5rem;box-shadow:var(--shadow);display:none}
+  .result-card.visible{display:block}
+  .result-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+  .result-score-badge{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;font-family:'Playfair Display',serif;flex-shrink:0}
+  .result-header h3{font-family:'Playfair Display',serif;font-size:18px;color:var(--text)}
+  .result-header p{font-size:13px;color:var(--text2)}
+  .result-text{font-size:14px;color:var(--text);line-height:1.8}
+  .result-text.loading{color:var(--text3);font-style:italic}
+  .typing-dots{display:inline-flex;gap:4px;align-items:center}
+  .typing-dots span{width:7px;height:7px;border-radius:50%;background:var(--accent);display:inline-block;animation:bounce 1.1s infinite ease-in-out}
+  .typing-dots span:nth-child(2){animation-delay:.18s}
+  .typing-dots span:nth-child(3){animation-delay:.36s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.6}40%{transform:translateY(-7px);opacity:1}}
+
+  .history-section{margin-top:2rem}
+  .history-title{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+  .history-list{display:flex;flex-direction:column;gap:8px}
+  .history-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:12px;font-size:13px}
+  .history-item .h-emoji{font-size:20px}
+  .history-item .h-info{flex:1}
+  .history-item .h-time{font-size:11px;color:var(--text3)}
+  .history-item .h-score{font-weight:700;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"><i class="ti ti-heart-rate-monitor"></i></div>
+    <div>
+      <h1>Емоционален метър</h1>
+      <p>Как се чувстваш днес?</p>
+    </div>
+  </div>
+  <a href="index.html" class="back-link"><i class="ti ti-arrow-left"></i> Обратно</a>
+</header>
+
+<div class="container">
+
+  <div class="intro-card">
+    <h2>💜 Как се чувстваш?</h2>
+    <p>Отдели 2 минути за себе си. Отговори честно на въпросите по-долу — получаваш персонализирана обратна връзка и подкрепа.</p>
+  </div>
+
+  <!-- MOOD METER -->
+  <div class="meter-card">
+    <h3>Как се чувствам в момента?</h3>
+    <div class="mood-meter" id="moodMeter">
+      <div class="mood-option" data-val="1" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😔</span>
+        <span class="mood-label">Трудно ми е</span>
+      </div>
+      <div class="mood-option" data-val="2" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😤</span>
+        <span class="mood-label">Стресиран съм</span>
+      </div>
+      <div class="mood-option" data-val="3" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😐</span>
+        <span class="mood-label">Не мога да определя</span>
+      </div>
+      <div class="mood-option" data-val="4" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😊</span>
+        <span class="mood-label">Спокоен съм</span>
+      </div>
+      <div class="mood-option" data-val="5" onclick="selectMainMood(this)">
+        <span class="mood-emoji">🥰</span>
+        <span class="mood-label">Удовлетворен</span>
+      </div>
+    </div>
+
+    <div class="meter-bar-wrap">
+      <div class="meter-bar-bg">
+        <div class="meter-needle" id="meterNeedle" style="left:50%"></div>
+      </div>
+      <div class="meter-labels">
+        <span>Трудно</span>
+        <span>Средно</span>
+        <span>Отлично</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div class="questions-section">
+
+    <div class="q-card">
+      <h4><span>⚡</span> Как е нивото ти на енергия днес?</h4>
+      <div class="scale-row" id="q-energy"></div>
+      <div class="scale-ends"><span>Изтощен/а</span><span>Пълен/а с енергия</span></div>
+    </div>
+
+    <div class="q-card">
+      <h4><span>🤝</span> Чувствах ли се разбран/а и подкрепен/а днес?</h4>
+      <div class="yesno-row">
+        <button class="yn-btn" id="yn-support-yes" onclick="selectYesNo('support','yes')">✅ Да</button>
+        <button class="yn-btn" id="yn-support-no" onclick="selectYesNo('support','no')">❌ Не</button>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <h4><span>😴</span> Как спа тази нощ?</h4>
+      <div class="scale-row" id="q-sleep"></div>
+      <div class="scale-ends"><span>Много зле</span><span>Чудесно</span></div>
+    </div>
+
+    <div class="q-card">
+      <h4><span>💝</span> Имах ли качествено време с детето си днес?</h4>
+      <div class="yesno-row">
+        <button class="yn-btn" id="yn-time-yes" onclick="selectYesNo('time','yes')">✅ Да</button>
+        <button class="yn-btn" id="yn-time-no" onclick="selectYesNo('time','no')">❌ Не</button>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <h4><span>🧘</span> Успях ли да отделя поне малко момент за себе си?</h4>
+      <div class="yesno-row">
+        <button class="yn-btn" id="yn-selfcare-yes" onclick="selectYesNo('selfcare','yes')">✅ Да</button>
+        <button class="yn-btn" id="yn-selfcare-no" onclick="selectYesNo('selfcare','no')">❌ Не</button>
+      </div>
+    </div>
+
+    <div class="q-card">
+      <h4><span>🌊</span> Как се справих с трудните моменти днес?</h4>
+      <div class="scale-row" id="q-coping"></div>
+      <div class="scale-ends"><span>Много зле</span><span>Много добре</span></div>
+    </div>
+
+    <div style="text-align:center;margin-top:1.5rem">
+      <button class="btn btn-accent" id="analyzeBtn" onclick="analyzeEmotions()">
+        <i class="ti ti-sparkles"></i> Анализирай и получи обратна връзка
+      </button>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-header">
+        <div class="result-score-badge" id="scoreBadge"></div>
+        <div>
+          <h3 id="resultTitle">Твоят емоционален портрет</h3>
+          <p id="resultSubtitle"></p>
+        </div>
+      </div>
+      <div class="result-text" id="resultText"></div>
+      <div style="margin-top:1.25rem;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" onclick="resetForm()"><i class="ti ti-refresh"></i> Нова оценка</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- HISTORY -->
+  <div class="history-section" id="historySection" style="display:none">
+    <p class="history-title">Последни записи</p>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+</div>
+
+<script>
+let answers = { mood: null, energy: null, sleep: null, coping: null, support: null, time: null, selfcare: null };
+let history = [];
+
+const moodLabels = {1:'Трудно ми е 😔', 2:'Стресиран/а съм 😤', 3:'Не мога да определя 😐', 4:'Спокоен/а съм 😊', 5:'Удовлетворен/а 🥰'};
+const moodColors = {1:'#C0392B',2:'#E67E22',3:'#F39C12',4:'#27AE60',5:'#7C4DFF'};
+const moodBg    = {1:'#FDECEA',2:'#FDF0E3',3:'#FEFCE8',4:'#EAF5EE',5:'#EDE7FF'};
+
+function selectMainMood(el) {
+  document.querySelectorAll('.mood-option').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  answers.mood = parseInt(el.dataset.val);
+  const pct = ((answers.mood - 1) / 4) * 88 + 6;
+  document.getElementById('meterNeedle').style.left = pct + '%';
+}
+
+function buildScale(containerId, key, max=5) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  for(let i=1;i<=max;i++){
+    const btn = document.createElement('button');
+    btn.className = 'scale-btn';
+    btn.textContent = i;
+    btn.onclick = () => {
+      c.querySelectorAll('.scale-btn').forEach(b=>b.classList.remove('selected'));
+      btn.classList.add('selected');
+      answers[key] = i;
+    };
+    c.appendChild(btn);
+  }
+}
+
+function selectYesNo(key, val) {
+  answers[key] = val;
+  document.getElementById('yn-'+key+'-yes').className = 'yn-btn' + (val==='yes'?' selected-yes':'');
+  document.getElementById('yn-'+key+'-no').className = 'yn-btn' + (val==='no'?' selected-no':'');
+}
+
+async function analyzeEmotions() {
+  const filled = Object.values(answers).filter(v=>v!==null).length;
+  if(filled < 3) { alert('Моля, отговори на поне 3 въпроса.'); return; }
+
+  const btn = document.getElementById('analyzeBtn');
+  const card = document.getElementById('resultCard');
+  const textEl = document.getElementById('resultText');
+  const badge = document.getElementById('scoreBadge');
+  const titleEl = document.getElementById('resultTitle');
+  const subtitleEl = document.getElementById('resultSubtitle');
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader"></i> Анализирам...';
+  card.classList.add('visible');
+  textEl.className = 'result-text loading';
+  textEl.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+  const score = computeScore();
+  badge.textContent = score + '/10';
+  badge.style.background = score <= 3 ? '#FDECEA' : score <= 6 ? '#FDF0E3' : '#EAF5EE';
+  badge.style.color = score <= 3 ? '#C0392B' : score <= 6 ? '#C47A3A' : '#3A7A5A';
+
+  const emoji = answers.mood ? ['','😔','😤','😐','😊','🥰'][answers.mood] : '😐';
+  titleEl.textContent = 'Твоят емоционален портрет ' + emoji;
+  subtitleEl.textContent = 'Обща оценка: ' + score + ' от 10';
+
+  const prompt = `Родител попълни емоционален въпросник. Ето резултатите:
+- Основно настроение: ${answers.mood ? moodLabels[answers.mood] : 'не е отбелязано'}
+- Ниво на енергия: ${answers.energy || 'не е отбелязано'}/5
+- Качество на съня: ${answers.sleep || 'не е отбелязано'}/5
+- Справяне с трудни моменти: ${answers.coping || 'не е отбелязано'}/5
+- Чувствал се подкрепен: ${answers.support === 'yes' ? 'Да' : answers.support === 'no' ? 'Не' : 'не е отбелязано'}
+- Качествено време с детето: ${answers.time === 'yes' ? 'Да' : answers.time === 'no' ? 'Не' : 'не е отбелязано'}
+- Момент за себе си: ${answers.selfcare === 'yes' ? 'Да' : answers.selfcare === 'no' ? 'Не' : 'не е отбелязано'}
+- Обща оценка: ${score}/10
+
+Напиши кратко, топло и персонализирано послание на български:
+1. Признай как се чувства родителят в момента (2-3 изречения)
+2. Дай 2-3 конкретни и реалистични съвета съобразени с резултатите (не общи фрази)
+3. Завърши с мотивиращо изречение
+
+Говори директно към родителя (ти-форма). Бъди топъл, не клиничен.`;
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:'Ти си топъл, съпричастен асистент за родители. Говориш само на български. Отговаряш лично, конкретно и мотивиращо — като близък приятел с психологически усет.',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const json = await res.json();
+    const text = (json.content||[]).map(c=>c.text||'').join('');
+    textEl.className = 'result-text';
+    textEl.textContent = text || 'Благодаря, че отдели момент за себе си. Това само по себе си е важна стъпка. 💜';
+
+    history.unshift({ score, mood: answers.mood ? moodLabels[answers.mood] : '—', time: new Date().toLocaleTimeString('bg', {hour:'2-digit',minute:'2-digit'}) });
+    if(history.length > 5) history.pop();
+    renderHistory();
+  } catch(e) {
+    textEl.className = 'result-text';
+    textEl.textContent = 'Не успях да се свържа в момента. Но фактът, че проверяваш как се чувстваш, вече е знак на грижа към себе си. 💜';
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="ti ti-sparkles"></i> Анализирай и получи обратна връзка';
+}
+
+function computeScore() {
+  let total = 0, count = 0;
+  if(answers.mood){ total += (answers.mood/5)*10; count++; }
+  if(answers.energy){ total += (answers.energy/5)*10; count++; }
+  if(answers.sleep){ total += (answers.sleep/5)*10; count++; }
+  if(answers.coping){ total += (answers.coping/5)*10; count++; }
+  if(answers.support){ total += answers.support==='yes'?10:3; count++; }
+  if(answers.time){ total += answers.time==='yes'?10:4; count++; }
+  if(answers.selfcare){ total += answers.selfcare==='yes'?10:4; count++; }
+  return count > 0 ? Math.round(total/count) : 5;
+}
+
+function resetForm(){
+  answers = {mood:null,energy:null,sleep:null,coping:null,support:null,time:null,selfcare:null};
+  document.querySelectorAll('.mood-option').forEach(o=>o.classList.remove('selected'));
+  document.getElementById('meterNeedle').style.left='50%';
+  buildScale('q-energy','energy');
+  buildScale('q-sleep','sleep');
+  buildScale('q-coping','coping');
+  ['support','time','selfcare'].forEach(k=>{
+    document.getElementById('yn-'+k+'-yes').className='yn-btn';
+    document.getElementById('yn-'+k+'-no').className='yn-btn';
+  });
+  document.getElementById('resultCard').classList.remove('visible');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderHistory(){
+  if(!history.length) return;
+  const sec = document.getElementById('historySection');
+  sec.style.display='block';
+  const emojis=['','😔','😤','😐','😊','🥰'];
+  document.getElementById('historyList').innerHTML = history.map(h=>`
+    <div class="history-item">
+      <span class="h-emoji">${h.mood ? (emojis[Object.keys(moodLabels).find(k=>moodLabels[k]===h.mood)||3]||'😐') : '😐'}</span>
+      <div class="h-info">
+        <div>${h.mood}</div>
+        <div class="h-time">${h.time}</div>
+      </div>
+      <span class="h-score">${h.score}/10</span>
+    </div>`).join('');
+}
+
+// init
+buildScale('q-energy','energy');
+buildScale('q-sleep','sleep');
+buildScale('q-coping','coping');
+</script>
+</body>
+</html>
