@@ -43,7 +43,9 @@
   .meter-card h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:1.25rem}
 
   .mood-meter{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:1rem}
-  .mood-option{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:14px 10px;border-radius:var(--radius);border:2px solid transparent;background:var(--surface2);transition:all .2s;min-width:90px;flex:1}
+  .mood-option{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:12px 8px;border-radius:var(--radius);border:2px solid transparent;background:var(--surface2);transition:all .2s;min-width:80px;flex:1}
+  .mood-words{font-size:10px;color:rgba(0,0,0,0.5);text-align:center;line-height:1.5}
+  .em-bg-1{background:#E8F5E3}.em-bg-2{background:#FFF8E1}.em-bg-3{background:#FFF0E8}.em-bg-4{background:#EDE8F5}.em-bg-5{background:#FCE8EA}
   .mood-option:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:var(--shadow)}
   .mood-option.selected{border-color:var(--accent);background:var(--accent-light);box-shadow:0 4px 16px rgba(124,77,255,.2)}
   .mood-option .mood-emoji{font-size:32px;line-height:1}
@@ -129,25 +131,30 @@
   <div class="meter-card">
     <h3>Как се чувствам в момента?</h3>
     <div class="mood-meter" id="moodMeter">
-      <div class="mood-option" data-val="1" onclick="selectMainMood(this)">
-        <span class="mood-emoji">😔</span>
-        <span class="mood-label">Трудно ми е</span>
-      </div>
-      <div class="mood-option" data-val="2" onclick="selectMainMood(this)">
-        <span class="mood-emoji">😤</span>
-        <span class="mood-label">Стресиран съм</span>
-      </div>
-      <div class="mood-option" data-val="3" onclick="selectMainMood(this)">
-        <span class="mood-emoji">😐</span>
-        <span class="mood-label">Не мога да определя</span>
-      </div>
-      <div class="mood-option" data-val="4" onclick="selectMainMood(this)">
+      <div class="mood-option em-bg-1" data-val="1" onclick="selectMainMood(this)">
         <span class="mood-emoji">😊</span>
-        <span class="mood-label">Спокоен съм</span>
+        <span class="mood-label" style="color:#3A7A2A;font-weight:800">РАДОСТЕН/А</span>
+        <div class="mood-words">Благодарен · Свободен<br>Обновен · Щастлив</div>
       </div>
-      <div class="mood-option" data-val="5" onclick="selectMainMood(this)">
-        <span class="mood-emoji">🥰</span>
-        <span class="mood-label">Удовлетворен</span>
+      <div class="mood-option em-bg-2" data-val="2" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😌</span>
+        <span class="mood-label" style="color:#B07800;font-weight:800">СПОКОЕН/А</span>
+        <div class="mood-words">Уверен · Стабилен<br>Уравновесен · Сигурен</div>
+      </div>
+      <div class="mood-option em-bg-3" data-val="3" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😐</span>
+        <span class="mood-label" style="color:#C45A20;font-weight:800">ПРЕДИЗВИКАН/А</span>
+        <div class="mood-words">Раздразнен · Неуверен<br>Намусен · Изнервен</div>
+      </div>
+      <div class="mood-option em-bg-4" data-val="4" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😟</span>
+        <span class="mood-label" style="color:#5A3A8B;font-weight:800">НАПРЕГНАТ/А</span>
+        <div class="mood-words">Стресиран · Нервен<br>Притеснен · Тревожен</div>
+      </div>
+      <div class="mood-option em-bg-5" data-val="5" onclick="selectMainMood(this)">
+        <span class="mood-emoji">😩</span>
+        <span class="mood-label" style="color:#B03040;font-weight:800">ПРЕТОВАРЕН/А</span>
+        <div class="mood-words">Изтощен · Претиснат<br>Отчаян · Хаос</div>
       </div>
     </div>
 
@@ -156,9 +163,9 @@
         <div class="meter-needle" id="meterNeedle" style="left:50%"></div>
       </div>
       <div class="meter-labels">
-        <span>Трудно</span>
-        <span>Средно</span>
-        <span>Отлично</span>
+        <span>Радостен/а</span>
+        <span>Предизвикан/а</span>
+        <span>Претоварен/а</span>
       </div>
     </div>
   </div>
@@ -242,7 +249,7 @@
 let answers = { mood: null, energy: null, sleep: null, coping: null, support: null, time: null, selfcare: null };
 let history = [];
 
-const moodLabels = {1:'Трудно ми е 😔', 2:'Стресиран/а съм 😤', 3:'Не мога да определя 😐', 4:'Спокоен/а съм 😊', 5:'Удовлетворен/а 🥰'};
+const moodLabels = {1:'Радостен/а 😊', 2:'Спокоен/а 😌', 3:'Предизвикан/а 😐', 4:'Напрегнат/а 😟', 5:'Претоварен/а 😩'};
 const moodColors = {1:'#C0392B',2:'#E67E22',3:'#F39C12',4:'#27AE60',5:'#7C4DFF'};
 const moodBg    = {1:'#FDECEA',2:'#FDF0E3',3:'#FEFCE8',4:'#EAF5EE',5:'#EDE7FF'};
 
